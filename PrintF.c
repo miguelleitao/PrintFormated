@@ -78,7 +78,7 @@ int PrintF(char *format, ... ) {
 #ifdef TEST_APP
 
 int main() {
-  FPrintF(stdout,"%d+%d=%d, %f+%f=%f, str:'%s'\n",6,2,8,4.5,5.3,9.8,"tudo pronto");
+  FPrintF(stdout,"%d+%d=%d, %f+%f=%f, str:'%s'\n",6,2,8,4.5,5.3,9.8,"all done");
   return 0;
 }
 
