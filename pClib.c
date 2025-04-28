@@ -103,21 +103,72 @@ static void itoa(long num, int base, char *out) {
     out[i] = 0;
 }
 
+void ftoa(float num, char *out) {
+    int int_part = (int)num;         		// Parte inteira
+    float frac_part = num - int_part; 		// Parte fracionária
+    if (frac_part < 0) frac_part = -frac_part; // Corrige caso negativo
+
+    // Converte parte inteira
+    int i = 0;
+    if (num < 0 && int_part == 0)
+        out[i++] = '-';
+    if (int_part == 0) {
+        out[i++] = '0';
+    } else {
+        // Preenche número invertido
+        int int_temp = int_part;
+        char temp[20];
+        int j = 0;
+        if (int_temp < 0) int_temp = -int_temp;
+        while (int_temp) {
+            temp[j++] = '0' + (int_temp % 10);
+            int_temp /= 10;
+        }
+        // Copia na ordem certa
+        if (int_part < 0) out[i++] = '-';
+        while (j--) {
+            out[i++] = temp[j];
+        }
+    }
+    out[i++] = '.'; // Ponto decimal
+    // Converte parte fracionária (usa 6 dígitos)
+    for (int k = 0; k < 6; k++) {
+        frac_part *= 10.0f;
+        int digit = (int)frac_part;
+        out[i++] = '0' + digit;
+        frac_part -= digit;
+    }
+    out[i] = '\0'; // Finaliza a string
+}
+
 // printf mínimo
 int printf(const char *fmt, ...) {
     va_list ap;
     va_start(ap, fmt);
 
-    char buf[32];
+                sys_write(1, "printf(", 7);
+                 sys_write(1, fmt, strlen(fmt) );
+                sys_write(1, "\n", 1);
+    char buf[532];
     for (size_t i = 0; fmt[i]; i++) {
         if (fmt[i] == '%') {
             i++;
             if (fmt[i] == 's') {
                 const char *str = va_arg(ap, const char *);
                 sys_write(1, str, strlen(str));
-            } else if (fmt[i] == 'd') {
+                sys_write(1, "\n", 1);
+            } else if (fmt[i] == 'd' || fmt[i] == 'f') {
                 int val = va_arg(ap, int);
                 itoa(val, 10, buf);
+                sys_write(1, buf, strlen(buf));
+            } else if (fmt[i] == 'g') {
+                sys_write(1, "float\n", 6);
+                //double val = va_arg(ap, double);
+                double val=9.3;
+                int vi = (int)val;
+				itoa(vi, 10, buf);
+                sys_write(1, buf, strlen(buf));
+                ftoa((float)val, buf);
                 sys_write(1, buf, strlen(buf));
             } else if (fmt[i] == 'x') {
                 int val = va_arg(ap, int);
@@ -128,7 +179,6 @@ int printf(const char *fmt, ...) {
             sys_write(1, &fmt[i], 1);
         }
     }
-
     va_end(ap);
     return 0;
 }
@@ -190,28 +240,13 @@ int system(const char *cmd) {
         syscall1(60, 1); // exit(1) se execve falhar
     } else {
         // pai
-        int status;
+        int status=0;
         waitpid(pid, &status, 0);
         return status;
     }
     return 0;
 }
-/*
-static long syscall_read(int fd, void *buf, uint32_t count) {
-    long ret;
-    asm volatile (
-        "movq $0, %%rax\n\t"
-        "movq %1, %%rdi\n\t"
-        "movq %2, %%rsi\n\t"
-        "movq %3, %%rdx\n\t"
-        "syscall\n\t"
-        : "=a"(ret)
-        : "r"((long)fd), "r"(buf), "r"(count)
-        : "rdi", "rsi", "rdx"
-    );
-    return ret;
-}
-*/
+
 static ssize_t syscall_read(int fd, void *buf, size_t count) {
     ssize_t ret;
     asm volatile (
@@ -277,8 +312,12 @@ void _start() {
 	putc('m');
 	*/
 	puts("Hello World.\n");
-	
-    //printf("%d+%d=%d, %f+%f=%f, str:'%s'\n",6,2,8,4.5,5.3,9.8,"all done");
+	    float a = 4.5f;
+    printf(" int: %d+%d=%d\n", 6,   2,   8);
+    printf(" f1: %d \n", a);
+    
+    printf(" float: %f+%f=%f\n", 4.5f, 5.3f, 9.8f);
+    printf(" str:'%s'\n", "all done");
     printf("35=%d\n", atoi("35"));
         asm volatile (
         "movq $60, %%rax\n\t" // sys_exit
