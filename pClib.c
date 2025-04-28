@@ -325,7 +325,7 @@ void _start() {
     #ifdef _PRINTF_FLOAT_
     printf("  float: %f+%f=%f\n", 4.5f, 5.3f, 9.8f);
     #endif
-    printf("  str:'%s'\n", "all done");
+    printf("  str: '%s'\n", "all done");
     printf("Testing atoi:\n  '2735'=%d\n", atoi("2735"));
     
     // Exit
