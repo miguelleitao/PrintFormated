@@ -1,8 +1,9 @@
 
 /*
-	cWrapper.c
+	pClib.c
+	pico C library
 
-	Set of functions wrappers to common C library functions.
+	Alternative implementation of common C library functions.
 
 	Miguel Leitao, 2025
 */
@@ -10,7 +11,6 @@
 #include <stdarg.h>
 
 #define NULL ((void *)0)
-
 
 typedef unsigned long size_t;
 typedef long ssize_t;
@@ -63,7 +63,6 @@ int puts(const char *str) {
     while (str[len]) {
         len++;
     }
-
     // Escreve a string seguida de nova linha
     sys_write(1, str, len);         // escreve a string
     sys_write(1, "\n", 1);          // escreve a nova linha
@@ -72,9 +71,7 @@ int puts(const char *str) {
 }
 
 int putchar(int c) {
-	//char buf[2];
-	//buf[0] = c;
-	//buf[1] = 0;
+
 	sys_write(1, (const char *)&c, 1);
 	return c;
 }
@@ -165,12 +162,12 @@ int printf(const char *fmt, ...) {
             if (fmt[i] == 's') {
                 const char *str = va_arg(ap, const char *);
                 sys_write(1, str, strlen(str));
-            } else if (fmt[i] == 'd' || fmt[i] == 'f') {
+            } else if (fmt[i] == 'd' ) {
                 int val = va_arg(ap, int);
                 itoa(val, 10, buf);
                 sys_write(1, buf, strlen(buf));
             #ifdef _PRINTF_FLOAT_    
-            } else if (fmt[i] == 'g') {
+            } else if (fmt[i] == 'f') {
                 sys_write(1, "float\n", 6);
                 //double val = va_arg(ap, double);
                 double val=9.3;
@@ -329,7 +326,7 @@ void _start() {
     printf("Testing atoi:\n  '2735'=%d\n", atoi("2735"));
     
     // Exit
-        asm volatile (
+    asm volatile (
         "movq $60, %%rax\n\t" // sys_exit
         "xorq %%rdi, %%rdi\n\t"
         "syscall\n\t"
