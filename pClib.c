@@ -71,6 +71,14 @@ int puts(const char *str) {
     return len + 1; // Retorna o número de caracteres (incluindo '\n')
 }
 
+int putchar(int c) {
+	//char buf[2];
+	//buf[0] = c;
+	//buf[1] = 0;
+	sys_write(1, (const char *)&c, 1);
+	return c;
+}
+
 // Converte inteiro para string (base 10 ou 16)
 static void itoa(long num, int base, char *out) {
     const char *digits = "0123456789abcdef";
@@ -145,10 +153,11 @@ void ftoa(float num, char *out) {
 int printf(const char *fmt, ...) {
     va_list ap;
     va_start(ap, fmt);
-
-                sys_write(1, "printf(", 7);
-                 sys_write(1, fmt, strlen(fmt) );
-                sys_write(1, "\n", 1);
+    #ifdef _DEBUG_
+		sys_write(1, "printf(", 7);
+		sys_write(1, fmt, strlen(fmt) );
+		sys_write(1, ")\n", 1);
+	#endif	
     char buf[532];
     for (size_t i = 0; fmt[i]; i++) {
         if (fmt[i] == '%') {
@@ -156,11 +165,11 @@ int printf(const char *fmt, ...) {
             if (fmt[i] == 's') {
                 const char *str = va_arg(ap, const char *);
                 sys_write(1, str, strlen(str));
-                sys_write(1, "\n", 1);
             } else if (fmt[i] == 'd' || fmt[i] == 'f') {
                 int val = va_arg(ap, int);
                 itoa(val, 10, buf);
                 sys_write(1, buf, strlen(buf));
+            #ifdef _PRINTF_FLOAT_    
             } else if (fmt[i] == 'g') {
                 sys_write(1, "float\n", 6);
                 //double val = va_arg(ap, double);
@@ -170,6 +179,7 @@ int printf(const char *fmt, ...) {
                 sys_write(1, buf, strlen(buf));
                 ftoa((float)val, buf);
                 sys_write(1, buf, strlen(buf));
+            #endif    
             } else if (fmt[i] == 'x') {
                 int val = va_arg(ap, int);
                 itoa(val, 16, buf);
@@ -302,23 +312,23 @@ int scanf(const char *fmt, ...) {
 
 #ifdef TEST_APP
 
-void _start() {
-	/*
-	char c = 'A'; 
-	putc(c);
-	putc('r');
-	putc('c');
-	putc('o');
-	putc('m');
-	*/
-	puts("Hello World.\n");
-	    float a = 4.5f;
-    printf(" int: %d+%d=%d\n", 6,   2,   8);
-    printf(" f1: %d \n", a);
+void _start() {	
+	puts("Testing puts:\n  Hello World.");
+	puts("Testing putchar:");
+	    putchar(' ');
+	    putchar(' '); 
+	    putchar('O');
+	    putchar('K');
+	    putchar('\n');
+	puts("Testing printf:");
+    printf("  int: %d+%d=%d\n", 65,   27,   65+27);
+    #ifdef _PRINTF_FLOAT_
+    printf("  float: %f+%f=%f\n", 4.5f, 5.3f, 9.8f);
+    #endif
+    printf("  str:'%s'\n", "all done");
+    printf("Testing atoi:\n  '2735'=%d\n", atoi("2735"));
     
-    printf(" float: %f+%f=%f\n", 4.5f, 5.3f, 9.8f);
-    printf(" str:'%s'\n", "all done");
-    printf("35=%d\n", atoi("35"));
+    // Exit
         asm volatile (
         "movq $60, %%rax\n\t" // sys_exit
         "xorq %%rdi, %%rdi\n\t"
@@ -327,7 +337,6 @@ void _start() {
         :
         : "rax", "rdi"
     );
-  //return 0;
 }
 
 #endif
