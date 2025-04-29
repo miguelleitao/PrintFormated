@@ -17,7 +17,7 @@ ${PCLIB}: ${PCLIB}.c
 	gcc ${CFLAGS} -DTEST_APP $< -o $@ -nostdlib -fPIE
 
 ${PCLIB}.o: ${PCLIB}.c
-	gcc ${CFLAGS} -c $<
+	gcc ${CFLAGS} -c -fPIE $<
 
 ${PCLIB}.a: ${PCLIB}.o
 	ar rcs $@ $^

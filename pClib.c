@@ -1,4 +1,3 @@
-
 /*
 	pClib.c
 	pico C library
@@ -168,12 +167,12 @@ int printf(const char *fmt, ...) {
                 sys_write(1, buf, strlen(buf));
             #ifdef _PRINTF_FLOAT_    
             } else if (fmt[i] == 'f') {
-                sys_write(1, "float\n", 6);
-                //double val = va_arg(ap, double);
-                double val=9.3;
-                int vi = (int)val;
-				itoa(vi, 10, buf);
-                sys_write(1, buf, strlen(buf));
+                //sys_write(1, "(float)", 7);
+                double val = va_arg(ap, double);
+                //double val=9.3;
+                //int vi = (int)val;
+		//itoa(vi, 10, buf);
+                //sys_write(1, buf, strlen(buf));
                 ftoa((float)val, buf);
                 sys_write(1, buf, strlen(buf));
             #endif    
@@ -310,6 +309,7 @@ int scanf(const char *fmt, ...) {
 #ifdef TEST_APP
 
 void _start() {	
+//int main() {
 	puts("Testing puts:\n  Hello World.");
 	puts("Testing putchar:");
 	    putchar(' ');
@@ -320,7 +320,8 @@ void _start() {
 	puts("Testing printf:");
     printf("  int: %d+%d=%d\n", 65,   27,   65+27);
     #ifdef _PRINTF_FLOAT_
-    printf("  float: %f+%f=%f\n", 4.5f, 5.3f, 9.8f);
+    //printf("  float: %f+%f=%f\n", 4.5f, 5.3f, 9.8f);
+    printf("    float: %f   _fim_  \n", 4.5f);
     #endif
     printf("  str: '%s'\n", "all done");
     printf("Testing atoi:\n  '2735'=%d\n", atoi("2735"));
@@ -334,6 +335,7 @@ void _start() {
         :
         : "rax", "rdi"
     );
+//return 0;
 }
 
 #endif
